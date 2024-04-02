@@ -4,11 +4,26 @@ import InputBox from "../components/InputBox";
 import googleIcon from "../imgs/google.png";
 import { Link } from "react-router-dom";
 import {Toaster,toast} from 'react-hot-toast'
+import axios from "axios"
+import { storeInSession } from "../common/session";
 function UserAuthForm({ type }) {
-  const authForm = useRef();
+
+  const userAuthThroughServer=(serverRoute,formData)=>{
+    axios.post(import.meta.env.VITE_SERVER_DOMAIN + serverRoute, formData)
+    .then(({data})=>{
+      storeInSession("user",JSON.stringify(data))
+      console.log(sessionStorage);
+    })
+    .catch(({response})=>{
+      toast.error(response.data.error)
+    })
+  }
+
   const handleSubmit = (e) => {
     e.preventDefault();
-    let form = new FormData(authForm.current);
+
+    let serverRoute = type == "sign-in"?"/signin":"/signup" 
+    let form = new FormData(formElement);
     let formData = {};
     let emailRegex = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/; // regex for email
     let passwordRegex = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{6,20}$/; // regex for password
@@ -31,13 +46,14 @@ function UserAuthForm({ type }) {
     if (!passwordRegex.test(password)) {
       toast.error("Password should be 6 to 20 characters long with 1 numeric,1 lowercase and 1 uppercase");
     }
+    userAuthThroughServer(serverRoute,formData)
 
   };
   return (
     <AnimationWrapper keyValue={type}>
       <section className="h-cover flex items-center justify-center">
         <Toaster/>
-        <form ref={authForm} className="w-[80%] max-w-[400px]">
+        <form id="formElement" className="w-[80%] max-w-[400px]">
           <h1 className="text-4xl font-gelasio capitalize text-center mb-24">
             {type == "sign-in" ? "Welcome back" : "Join Us Today"}
           </h1>

@@ -4,6 +4,7 @@ import 'dotenv/config'
 import bcrypt from 'bcrypt'
 import { nanoid } from 'nanoid'
 import  jwt  from 'jsonwebtoken'
+import cors from 'cors'
 
 import User from './Schema/User.js'
 const server=express()
@@ -14,6 +15,7 @@ mongoose.connect(process.env.DB_LOCATION,{
     autoIndex:true
 })
 server.use(express.json())
+server.use(cors())
 
 const generateUsername=async(email)=>{
     let username=email.split("@")[0]
